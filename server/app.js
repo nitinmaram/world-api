@@ -4,7 +4,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors')
 
-var convertT9Route = require('./routes/convertT9');
+var popRoute = require('./routes/popRoute');
+var gdpRoute = require('./routes/gdpRoute');
 var app = express();
 
 var corsOptions = {
@@ -20,7 +21,8 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'build')));
 
-app.use('/convertT9',convertT9Route);
+app.use('/country/all/indicator/SP.POP.TOTL',popRoute);
+app.use('/country/all/indicator/NY.GDP.MKTP.CD',gdpRoute);
 
 
 module.exports = app;

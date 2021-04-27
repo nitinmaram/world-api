@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
-const { convertT9  } = require('../controllers/convertT9')
+const { getGdp  } = require('../controllers/getGdp')
 
 
-router.get('/', convertT9);
+router.get('/', getGdp);
 
 module.exports = router;
