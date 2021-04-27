@@ -1,7 +1,9 @@
 export function mapData(masterData) {
+    let pageData = masterData[0][0];
     let popData = masterData[0][1];
     let gdpData = masterData[1][1];
-    return popData.map((pop, ind) => {
+
+    let transformedData = popData && popData.map((pop, ind) => {
        let matchedGdp = gdpData.find( gdp => (gdp.country.value === pop.country.value 
         && gdp.date === pop.date));        
         return ({
@@ -11,4 +13,6 @@ export function mapData(masterData) {
             year: matchedGdp.date
         });
     });
+    transformedData.pageData = pageData;
+    return transformedData;
   }

@@ -1,29 +1,23 @@
 import _ from 'lodash'
-import React, { useEffect, useState } from 'react'
-import { Table } from 'semantic-ui-react'
-import { getPopulation } from '../services/fetchData';
-import { mapData } from '../helpers/transformData';
+import React, { useEffect } from 'react'
+import { Table} from 'semantic-ui-react'
+
 import { tableReducer } from '../reducers/tabReducer'
 
-function TableExampleSortable() {
-  const [state, dispatch] = React.useReducer(tableReducer, {
+function TableExampleSortable(props) {
+  const  {tableData} = props
+   const [state, dispatch] = React.useReducer(tableReducer, {
     column: null,
-    data: [],
+    data: tableData,
     direction: null,
   })
-  useEffect(() => {
-    let mounted = true;
-    getPopulation().then(res => {
-      if (mounted) {
-        let transformedData = mapData(res);
-        dispatch({ type: 'UPDATE_DATA', data: transformedData });
-      }
-    })
-    return () => mounted = false;
-  }, []);
 
-  const { column, data, direction } = state
+  useEffect(() =>{
+    dispatch({type:'UPDATE_DATA', data: tableData })
+  },[tableData])
 
+  const { column, data, direction } = state;
+  
   return (
     <Table sortable celled fixed>
       <Table.Header>
