@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import Table from './Components/Table';
+import Table from './components/Table';
 import 'semantic-ui-css/semantic.min.css'
 
 function App() {

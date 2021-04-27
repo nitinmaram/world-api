@@ -1,84 +1,54 @@
 import _ from 'lodash'
-import React, {useEffect} from 'react'
+import React, { useEffect, useState } from 'react'
 import { Table } from 'semantic-ui-react'
-
-let tableData = [
-  { name: 'John', age: 15, gender: 'Male' },
-  { name: 'Amber', age: 40, gender: 'Female' },
-  { name: 'Leslie', age: 25, gender: 'Other' },
-  { name: 'Ben', age: 70, gender: 'Male' },
-]
-
-function exampleReducer(state, action) {
-  switch (action.type) {
-    case 'CHANGE_SORT':
-      if (state.column === action.column) {
-        return {
-          ...state,
-          data: state.data.slice().reverse(),
-          direction:
-            state.direction === 'ascending' ? 'descending' : 'ascending',
-        }
-      }
-
-      return {
-        column: action.column,
-        data: _.sortBy(state.data, [action.column]),
-        direction: 'ascending',
-      }
-    default:
-      throw new Error()
-  }
-}
+import { getPopulation } from '../services/fetchData';
+import { mapData } from '../helpers/transformData';
+import { tableReducer } from '../reducers/tabReducer'
 
 function TableExampleSortable() {
-  let res1, res2 = [];
-  useEffect(() => {
-    async function fetchData(){
-       [res1, res2] = await Promise.all([
-        fetch('http://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?source=2&format=json&mrv=1').
-        then(response => response.json()),
-        fetch('http://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.CD?source=2&format=json&mrv=1').then(response => response.json()),
-    ]);
-    res1.shift();
-    res2.shift();
-    console.log(dispatch);
-    
-    dispatch.call(state, { type: 'CHANGE_SORT', column: 'name' })
-  console.log(res1);
-  console.log(res2);
-    
-    }
-    fetchData()
-    
-  }, []);
-  const [state, dispatch] = React.useReducer(exampleReducer, {
+  const [state, dispatch] = React.useReducer(tableReducer, {
     column: null,
-    data: res1,
+    data: [],
     direction: null,
   })
+  useEffect(() => {
+    let mounted = true;
+    getPopulation().then(res => {
+      if (mounted) {
+        let transformedData = mapData(res);
+        dispatch({ type: 'UPDATE_DATA', data: transformedData });
+      }
+    })
+    return () => mounted = false;
+  }, []);
+
   const { column, data, direction } = state
-  
 
   return (
     <Table sortable celled fixed>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell
-            sorted={column === 'name' ? direction : null}
-            onClick={() => dispatch({ type: 'CHANGE_SORT', column: 'name' })}
+            sorted={column === 'country' ? direction : null}
+            onClick={() => dispatch({ type: 'CHANGE_SORT', column: 'country' })}
+          >
+            Country
+          </Table.HeaderCell>
+          <Table.HeaderCell
+            sorted={column === 'population' ? direction : null}
+            onClick={() => dispatch({ type: 'CHANGE_SORT', column: 'population' })}
           >
             Population
           </Table.HeaderCell>
           <Table.HeaderCell
-            sorted={column === 'age' ? direction : null}
-            onClick={() => dispatch({ type: 'CHANGE_SORT', column: 'age' })}
+            sorted={column === 'gdp' ? direction : null}
+            onClick={() => dispatch({ type: 'CHANGE_SORT', column: 'gdp' })}
           >
             GDP
           </Table.HeaderCell>
           <Table.HeaderCell
-            sorted={column === 'gender' ? direction : null}
-            onClick={() => dispatch({ type: 'CHANGE_SORT', column: 'gender' })}
+            sorted={column === 'year' ? direction : null}
+            onClick={() => dispatch({ type: 'CHANGE_SORT', column: 'year' })}
           >
             Year
           </Table.HeaderCell>
@@ -86,10 +56,11 @@ function TableExampleSortable() {
       </Table.Header>
       <Table.Body>
         {data && data.map((obj) => (
-          <Table.Row key={obj.country.id}>
-            <Table.Cell>{obj.indicator.value  }</Table.Cell>
-            <Table.Cell>{obj.indicator.value}</Table.Cell>
-            <Table.Cell>{obj.indicator.value}</Table.Cell>
+          <Table.Row key={obj.country}>
+            <Table.Cell>{obj.country}</Table.Cell>
+            <Table.Cell>{obj.population}</Table.Cell>
+            <Table.Cell>{obj.gdp}</Table.Cell>
+            <Table.Cell>{obj.year}</Table.Cell>
           </Table.Row>
         ))}
       </Table.Body>
