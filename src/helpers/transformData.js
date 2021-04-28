@@ -4,15 +4,16 @@ export function mapData(masterData) {
     let gdpData = masterData[1][1];
 
     let transformedData = popData && popData.map((pop, ind) => {
-       let matchedGdp = gdpData.find( gdp => (gdp.country.value === pop.country.value 
-        && gdp.date === pop.date));        
-        return ({
+        let matchedGdp = gdpData.find(gdp => (gdp.country.value === pop.country.value));
+        return (matchedGdp && {
             country: matchedGdp.country.value,
             population: pop.value,
             gdp: matchedGdp.value,
-            year: matchedGdp.date
+            gdpYear: matchedGdp.date,
+            popYear: pop.date
         });
     });
-    transformedData.pageData = pageData;
+    if (transformedData)
+        transformedData.pageData = pageData;
     return transformedData;
-  }
+}

@@ -1,59 +1,60 @@
 import React, { useEffect, useState } from "react";
 
-import { Container,Header,Pagination } from 'semantic-ui-react'
+import { Container, Header } from 'semantic-ui-react'
 
 import Table from '../components/Table';
 import Year from '../components/Year';
 
-import { getPopulation } from '../services/fetchData';
+import {
+  getPopulationAndGdpByMrv,
+  getPopulationAndGdpByYear,
+  getTotalPopulationAndGdp
+} from '../services/fetchData';
 import { mapData } from '../helpers/transformData';
 
-const Home =  () => {
+const Home = () => {
 
-    const [tableData, setTableData] = useState("");
-    const [yearInput, setYearInput]  = useState("2019");
-    useEffect(() => {
-        getPopulation().then(res => {
-            let transformedData = mapData(res);
-            setTableData(transformedData)
-        })
-      }, []);
+  const [tableData, setTableData] = useState("");
+  const [totalData, setTotalData] = useState("");
+  const [yearInput, setYearInput] = useState("2019");
 
-    const handleChange = (e) => {
-        setYearInput(e.target.value)
-    }
+  useEffect(() => {
+    getPopulationAndGdpByMrv().then(res => {
+      setTableData(res[0]);
+    })
+  }, []);
 
-    const handlePageChange  = (e, {activePage} ) => {
-      console.log(e, {activePage})
-        getPopulation(yearInput, activePage).then(res => {
-          let transformedData = mapData(res);
-          setTableData(transformedData)
-        })
-      }
-
-    const onButtonClick = () => {
-      getPopulation(yearInput).then(res => {
-        let transformedData = mapData(res);
-        setTableData(transformedData)
+  useEffect(() => {
+    if (tableData) {
+      getTotalPopulationAndGdp(yearInput, tableData.total).then(res => {
+        setTotalData(mapData(res))
       })
-    };
+    }
+  }, [tableData]);
 
-return (
-    <Container  textAlign='justified'>
-        <Year 
-        handleChange={handleChange} 
-        yearInput={yearInput} 
-        onButtonClick={onButtonClick} 
+  const handleChange = (e) => {
+    setYearInput(e.target.value)
+  }
+
+  const onButtonClick = () => {
+    getPopulationAndGdpByYear(yearInput).then(res => {
+      setTableData(res[0])
+    })
+  };
+
+  return (
+    <Container>
+      <Header data-testid="test" as='h1'>World's Key Metrics</Header>
+      <Year
+        handleChange={handleChange}
+        yearInput={yearInput}
+        onButtonClick={onButtonClick}
       />
-      <Header data-testid="test" as='h1'>Population vs GDP ??</Header>
-      {tableData && <>
-      <Pagination activePage = {tableData.pageData.page} 
-      totalPages={tableData.pageData && tableData.pageData.pages} 
-      onPageChange = {handlePageChange}/>
-      <Table tableData={tableData}/>
-      </>}
+      {totalData &&
+        <Table totalData={totalData} />
+      }
     </Container>
-)
+  )
 }
 
 
