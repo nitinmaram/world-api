@@ -6,39 +6,39 @@ import Table from '../components/Table';
 import Year from '../components/Year';
 
 import {
-  getPopulationAndGdpByMrv,
-  getPopulationAndGdpByYear,
+  getPopulationByMrv,
+  getPopulationByYear,
   getTotalPopulationAndGdp
 } from '../services/fetchData';
 import { mapData } from '../helpers/transformData';
 
 const Home = () => {
 
-  const [tableData, setTableData] = useState("");
+  const [pageData, setPageData] = useState("");
   const [totalData, setTotalData] = useState("");
   const [yearInput, setYearInput] = useState("2019");
 
   useEffect(() => {
-    getPopulationAndGdpByMrv().then(res => {
-      setTableData(res[0]);
+    getPopulationByMrv().then(res => {
+      setPageData(res[0]);
     })
   }, []);
 
   useEffect(() => {
-    if (tableData) {
-      getTotalPopulationAndGdp(yearInput, tableData.total).then(res => {
+    if (pageData) {
+      getTotalPopulationAndGdp(yearInput, pageData.total).then(res => {
         setTotalData(mapData(res))
       })
     }
-  }, [tableData]);
+  }, [pageData]);
 
   const handleChange = (e) => {
     setYearInput(e.target.value)
   }
 
   const onButtonClick = () => {
-    getPopulationAndGdpByYear(yearInput).then(res => {
-      setTableData(res[0])
+    getPopulationByYear(yearInput).then(res => {
+      setPageData(res[0])
     })
   };
 

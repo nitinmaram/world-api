@@ -25,6 +25,6 @@ describe('59892259', () => {
             (global).fetch = mockedFetch;
         const { getByTestId } = render(<Home></Home>);
         const div = await waitFor(() => getByTestId('test'));
-        expect(div).toHaveTextContent('Population vs GDP ??');
+        expect(div).toHaveTextContent("World's Key Metrics");
     });
 });
